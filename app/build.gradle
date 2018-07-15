@@ -1,0 +1,164 @@
+apply plugin: 'com.android.application'
+
+//apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion 26
+    defaultConfig {
+        applicationId "com.muaz.tut.gradle.gradletutorial"
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+
+        debug{
+
+            buildConfigField("String","API_URL","\"value\"")
+            buildConfigField("boolean","LOG_HTTP_REQUESTS","true")
+
+            //manifestPlaceholders = [appName : "GradleAppDebug"]
+            //resValue("string","app_name_gradle","GradleAppDebug")
+
+            applicationIdSuffix ".debug"
+            versionNameSuffix "-debug"
+
+
+
+        }
+
+
+
+        staging.initWith(buildTypes.debug)
+        staging {
+            applicationIdSuffix ".staging"
+            versionNameSuffix "-staging"
+            debuggable = false
+        }
+
+
+        release {
+            minifyEnabled true
+            shrinkResources true
+
+            buildConfigField("String","API_URL","\"value\"")
+            buildConfigField("boolean","LOG_HTTP_REQUESTS","false")
+
+            manifestPlaceholders = [appName : "GradleApp"]
+
+            //resValue("string","app_name_gradle","GradleApp")
+
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+
+
+    flavorDimensions "groceryName","userType"
+
+    productFlavors{
+
+        erdalBakkal {
+            dimension ("groceryName")
+            applicationIdSuffix ".erdalBakkal"
+            versionNameSuffix "-erdalBakkal"
+            manifestPlaceholders = [appName : "ErdalBakkal"]
+
+        }
+
+        kutayBakkal {
+            dimension ( "groceryName")
+            applicationIdSuffix ".kutayBakkal"
+            versionNameSuffix "-kutayBakkal"
+            manifestPlaceholders = [appName : "KutayBakkal"]
+
+
+        }
+
+        premiumUser {
+            dimension "userType"
+            applicationIdSuffix ".premium"
+            versionNameSuffix "-premium"
+
+        }
+
+        ordinaryUser {
+            dimension "userType"
+            applicationIdSuffix ".ordinary"
+            versionNameSuffix "-ordinary"
+
+        }
+    }
+
+    sourceSets {
+        main {
+            res.srcDirs =
+                    [
+                            'src/main/res/layout/activities',
+                            'src/main/res/layout/baselayouts',
+                            'src/main/res/layout/dialogs',
+                            'src/main/res/layout/fragments',
+                            'src/main/res/layout/rowitems',
+                            'src/main/res/layout/utillayouts',
+                            'src/main/res/layout',
+                            'src/main/res'
+                    ]
+        }
+    }
+
+    android.variantFilter { variant ->
+        if(variant.buildType.name.equals('release')) {
+            variant.getFlavors().each() { flavor ->
+                if (flavor.name.equals('erdalBakkal')) {
+                    variant.setIgnore(true)
+                }
+            }
+        }
+    }
+
+    android.applicationVariants.all { variant ->
+        variant.outputs.each { output ->
+            def file = output.outputFile
+            output.outputFileName = new File(file.parent,
+                    file.name.replace(".apk", "-2.apk"))
+        }
+    }
+
+}
+
+
+ext {
+    supportLibraryVersion = '27.1.1'
+}
+
+/*repositories {
+    maven {
+        url "repo_url"
+        credentials {
+            username 'user_name'
+            password 'password'
+        }
+    }
+}*/
+
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "com.android.support:appcompat-v7:$supportLibraryVersion"
+    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+
+
+
+    //compile files('libs/muaz.jar')
+    //compile fileTree('libs')
+    //compile fileTree(dir: 'libs', include: ['*.jar'])
+
+    //compile project(':library')
+
+    //debugCompile
+}

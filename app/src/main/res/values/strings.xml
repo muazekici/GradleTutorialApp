@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name_release">GradleApp</string>
+    <string name="app_name_debug">GradleAppDebug</string>
+
+    <string name="type_field">ordinary</string>
+
+</resources>
